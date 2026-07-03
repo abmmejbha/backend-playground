@@ -5,41 +5,25 @@ import path from 'path';
 
 app.use('/api/user', userRouter)
 
+// register page serving
 app.get("/register", (req, res) => {
-  // res.status(200).json({
-  //   "name" : "ABM Mejbha",
-  //   "message" : "This is Register Page",
-  //   statusCode: 200, 
-  // })
+  res.status(200).sendFile(path.resolve('views', 'register.html'));
+});
 
-  res.statusCode = 200;
-  res.sendFile(path.resolve('views', 'register.html'))
-})
+// query parameter testing route 
+app.get('/search', (req, res) => {
+  const { id, name } = req.query;
+  res.status(200).send(`Student name is ${name}, student id is: ${id}`);
+});
 
-app.get('/',(req, res) => {
-  const {id, name} = req.query;
-  res.send(`student name is ${name} ,  student id is : ${id}`)
-  // res.statusCode = 200;
+// Home page serving
+app.get('/', (req, res) => {
+  res.status(200).sendFile(path.resolve('views', 'index.html'));
+});
 
-  //res.sendFile(__dirname+"/views/index.html")
-  // কোনো __dirname ছাড়াই ডিরেক্টলি এভাবে লেখ:
-  // res.sendFile(path.resolve('views', 'index.html'));
-})
-
+// Global 404 Handling
 app.use((req, res) => {
-  res.send("<h1>404 NOT FOUND :( </h1>")
+  res.status(404).send("<h1>404 NOT FOUND :( </h1>")
 })
-
-
-
-// real API-তে res.send() দিয়ে text না পাঠিয়ে res.json() দিয়ে JSON পাঠানো হয়
-// app.get('/user', (req, res) => {
-//   res.json({
-//     name: 'Mejbha',
-//     age: 22,
-//     university: 'BUBT'
-//   });
-// });
-
 
 export default app;
