@@ -107,7 +107,7 @@ app.put('/products/:id', async(req, res) => {
 
 app.delete('/products/:id', async(req,res) => {
     try{
-        const id = req.query.id 
+        const id = req.params.id 
         const product = await Product.deleteOne({_id: id})
         if(product) {
             res.status(200).send({
