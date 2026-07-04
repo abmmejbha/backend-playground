@@ -1,0 +1,127 @@
+import express from 'express'
+const app = express()
+import mongoose from 'mongoose'
+
+app.use(express.json())
+
+//create product schema
+const ProductsSchema = new mongoose.Schema({
+    title: {
+        type: String,
+        required: true
+    },
+    price: Number,
+    rating: Number,
+    description: String,
+    createdAt: {
+        type:Date,
+        default: Date.now
+    }
+})
+
+// create product mdoel
+const Product = mongoose.model("Products", ProductsSchema)
+
+
+const connectDB = async () => {
+    try{
+        await mongoose.connect("mongodb://localhost:27017/test")
+        console.log("MongoDB connected sucecessfully")
+    }
+    catch(err){
+        console.error("MongoDB connection is error",err)
+    }
+}
+
+app.listen(3000, async () => {
+    console.log(`server is runnign at http://localhost:3000`)
+    await connectDB()
+})
+
+app.get('/', (req,res) => {
+    res.send("Welcome to the home page man")
+})
+
+// Create 
+app.post('/products', async (req,res) => {
+    try{
+        const product = new Product(req.body) // create a new product instance
+        await product.save()
+        res.status(200).send({message: "Product created successfully", product})
+    }catch(err) {
+        res.status(500).send({message: err.message})
+    }
+})
+
+// Read
+app.get('/products', async (req, res) => {
+    try {
+        const price = req.query.price
+        const rating = req.query.rating
+        let products;
+
+        if (price && rating) {
+            products = await Product.find({
+                $or: [
+                    { price: { $gt: Number(price) } }, 
+                    { rating: { $gt: Number(rating) } }
+                ]
+            })
+        } else {
+            products = await Product.find()
+        }
+
+        res.status(200).send({ message: "Products fetched successfully", products })
+    } catch (err) {
+        res.status(500).send({ message: err.message })
+    }
+})
+
+
+app.put('/products/:id', async(req, res) => {
+    try{
+        const id = req.params.id
+        // const {title, description, rating, price} = req.body
+        const product = new Product(req.body) 
+        const updatedProduct = await Product.findByIdAndUpdate(id,
+            req.body,
+            {new: true, runValidators: true}
+        )
+        if(updatedProduct){
+            res.status(200).send({
+                success: true,
+                message: "single product updated",
+                data: updatedProduct
+            })
+        }else{
+            res.status(404).send({
+                success: false,
+                message: "Product was not updated with this id"
+            })
+        }
+    }catch(error){
+        res.status(500).send({message: error.message})
+    }
+})
+
+
+app.delete('/products/:id', async(req,res) => {
+    try{
+        const id = req.query.id 
+        const product = await Product.deleteOne({_id: id})
+        if(product) {
+            res.status(200).send({
+                success: true,
+                message: "deleted single product",
+                data: product,
+            })
+        }else{
+            res.status(404).send({
+                success: false,
+                message: "product not found",
+            })
+        }
+    }catch(error) {
+        res.status(500).send({message: error.message})
+    }
+})
