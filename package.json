@@ -9,7 +9,9 @@
     "start": "node index.js",
     "dev": "nodemon index.js",
     "start-basics": "nodemon 01-Express-Basics/app.js",
-    "start-calc": "nodemon 02-Express-Area-Calculator/index.js"
+    "start-calc": "nodemon 02-Express-Area-Calculator/index.js",
+    "start-without-mvc": "nodemon 03-MVC-Structure/without-mvc/index.js",
+    "start-with-mvc": "nodemon 03-MVC-Structure/with-mvc/index.js"
   },
   "keywords": [],
   "author": "",
